@@ -1,60 +1,39 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String?  @unique
-  password  String
-  isAdmin   Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  pronostics Pronostic[]
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Athlete {
-  id        Int      @id @default(autoincrement())
-  ibuId     String?  @unique
+  id        Int       @id @default(autoincrement())
   name      String
-  nation    String?
-  sex       String?
-  createdAt DateTime @default(now())
+  country   String
+  gender    String
+  events    EventResult[]
 }
 
-model Course {
-  id        Int      @id @default(autoincrement())
-  ibuId     String?  @unique
+model Event {
+  id        Int           @id @default(autoincrement())
   name      String
   date      DateTime
-  type      String?
-  gender    String?
-  status    String   @default("upcoming")
-  createdAt DateTime @default(now())
-
-  results    Result?
-  pronostics Pronostic[]
+  results   EventResult[]
 }
 
-model Pronostic {
-  id             Int      @id @default(autoincrement())
-  userId         Int
-  courseId       Int
-  pick1AthleteId Int?
-  pick2AthleteId Int?
-  pick3AthleteId Int?
-  createdAt      DateTime @default(now())
+model EventResult {
+  id        Int      @id @default(autoincrement())
+  athlete   Athlete  @relation(fields: [athleteId], references: [id])
+  athleteId Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   Int
+  position  Int
+  score     Int
 }
 
-model Result {
-  id               Int      @id @default(autoincrement())
-  courseId         Int      @unique
-  result1AthleteId Int?
-  result2AthleteId Int?
-  result3AthleteId Int?
-  createdAt        DateTime @default(now())
+model UserScore {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  total     Int      @default(0)
 }
